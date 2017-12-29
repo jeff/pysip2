@@ -71,6 +71,7 @@ class Client(object):
         msg_txt = ''
         while True:
 
+            self.sock.settimeout(45.0)
             buf = self.sock.recv(SOCKET_BUFSIZE)
 
             if buf is None or len(buf) == 0: # server kicked us off
@@ -146,7 +147,10 @@ class Client(object):
         )
 
         self.send_msg(msg)
-        resp = self.recv_msg()
+        try:
+            resp = self.recv_msg()
+        except Exception as e:
+            logging.error("Exception on initial request for barcode %s" % (barcode,))
 
         # the OK field is 1/0 value in the fixed fields
         if resp.fixed_fields[0].value == '1':
